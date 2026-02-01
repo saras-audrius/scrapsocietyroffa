@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -8,8 +9,16 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CutoutText } from "@/components/ui/CutoutText";
 import { staggerContainer, fadeInUp } from "@/components/animations/variants";
+import { upcomingEvents } from "@/lib/events";
 
-export default function ContactPage() {
+// Formspree endpoint - create your free form at https://formspree.io
+// Replace with your actual form ID after signing up
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/mojleeoa";
+
+function ContactForm() {
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get("event");
+
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -18,18 +27,221 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Pre-fill form if coming from event registration
+  useEffect(() => {
+    if (eventId) {
+      const event = upcomingEvents.find((e) => e.id === eventId);
+      if (event) {
+        setFormState((prev) => ({
+          ...prev,
+          subject: "register",
+          message: `Hi! I'd like to register for "${event.title}" on ${event.date}.\n\nPlease let me know if spots are still available!`,
+        }));
+      }
+    }
+  }, [eventId]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError("");
 
-    // Simulate form submission - replace with actual API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          subject: formState.subject,
+          message: formState.message,
+          _subject: `[Scrap Society] ${formState.subject} from ${formState.name}`,
+        }),
+      });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+      } else {
+        setError("Something went wrong. Please try emailing us directly.");
+      }
+    } catch {
+      setError("Something went wrong. Please try emailing us directly.");
+    }
 
     setIsSubmitting(false);
-    setIsSubmitted(true);
   };
 
+  if (isSubmitted) {
+    return (
+      <Card variant="paper" className="text-center py-16">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <span className="text-6xl mb-6 block">&#x2709;&#xFE0F;</span>
+          <h2 className="font-[family-name:var(--font-special-elite)] text-2xl mb-4 text-charcoal">
+            Message Sent!
+          </h2>
+          <p className="text-charcoal/70 mb-6">
+            Thanks for reaching out! We&apos;ll get back to you soon.
+          </p>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setIsSubmitted(false);
+              setFormState({
+                name: "",
+                email: "",
+                subject: "general",
+                message: "",
+              });
+            }}
+          >
+            Send Another Message
+          </Button>
+        </motion.div>
+      </Card>
+    );
+  }
+
+  return (
+    <div
+      className="bg-[#FFFEF5] p-8 shadow-lg relative"
+      style={{
+        transform: "rotate(-1deg)",
+        backgroundImage: `
+          linear-gradient(transparent 27px, #E8E8E8 28px),
+          linear-gradient(90deg, transparent 97%, #F8B4B4 98%, #F8B4B4 100%)
+        `,
+        backgroundSize: "100% 28px, 100% 100%",
+      }}
+    >
+      {/* Stamp decoration */}
+      <div className="absolute top-4 right-4 w-16 h-20 border-2 border-dashed border-vintage-red/50 flex items-center justify-center">
+        <div className="text-center">
+          <span className="text-2xl">&#x2702;</span>
+          <p className="text-[0.5rem] text-vintage-red font-[family-name:var(--font-special-elite)]">
+            SCRAP
+            <br />
+            SOCIETY
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6 pr-20">
+        <div>
+          <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
+            Your Name
+          </label>
+          <input
+            type="text"
+            required
+            value={formState.name}
+            onChange={(e) =>
+              setFormState({ ...formState, name: e.target.value })
+            }
+            className="w-full bg-transparent border-b-2 border-kraft focus:border-vintage-red outline-none py-2 font-[family-name:var(--font-karla)] transition-colors"
+            placeholder="Jane Doe"
+          />
+        </div>
+
+        <div>
+          <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
+            Email Address
+          </label>
+          <input
+            type="email"
+            required
+            value={formState.email}
+            onChange={(e) =>
+              setFormState({ ...formState, email: e.target.value })
+            }
+            className="w-full bg-transparent border-b-2 border-kraft focus:border-vintage-red outline-none py-2 font-[family-name:var(--font-karla)] transition-colors"
+            placeholder="jane@example.com"
+          />
+        </div>
+
+        <div>
+          <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
+            Subject
+          </label>
+          <select
+            value={formState.subject}
+            onChange={(e) =>
+              setFormState({ ...formState, subject: e.target.value })
+            }
+            className="w-full bg-transparent border-b-2 border-kraft focus:border-vintage-red outline-none py-2 font-[family-name:var(--font-karla)] transition-colors cursor-pointer"
+          >
+            <option value="general">General Inquiry</option>
+            <option value="register">Event Registration</option>
+            <option value="collaborate">Collaboration</option>
+            <option value="press">Press / Media</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
+            Your Message
+          </label>
+          <textarea
+            required
+            rows={5}
+            value={formState.message}
+            onChange={(e) =>
+              setFormState({ ...formState, message: e.target.value })
+            }
+            className="w-full bg-transparent border-2 border-kraft focus:border-vintage-red outline-none p-3 font-[family-name:var(--font-karla)] transition-colors resize-none"
+            placeholder="Write your message here..."
+          />
+        </div>
+
+        <div className="pt-4">
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Sending..." : "Send Message &#x2709;"}
+          </Button>
+        </div>
+
+        {error && (
+          <div className="mt-4 p-3 bg-vintage-red/10 border border-vintage-red/30 text-sm text-charcoal">
+            {error}{" "}
+            <a
+              href={`mailto:sarasaudrius@gmail.com?subject=${encodeURIComponent(
+                formState.subject
+              )}&body=${encodeURIComponent(
+                `Name: ${formState.name}\nEmail: ${formState.email}\n\n${formState.message}`
+              )}`}
+              className="text-vintage-red underline"
+            >
+              Click here to email directly
+            </a>
+          </div>
+        )}
+      </form>
+
+      {/* Decorative postmark */}
+      <div className="absolute bottom-4 right-4 postmark">
+        <span className="relative z-10">
+          ROTTERDAM
+          <br />
+          NL
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -74,150 +286,9 @@ export default function ContactPage() {
             >
               {/* Postcard Form */}
               <motion.div variants={fadeInUp} className="lg:col-span-3">
-                {!isSubmitted ? (
-                  <div
-                    className="bg-[#FFFEF5] p-8 shadow-lg relative"
-                    style={{
-                      transform: "rotate(-1deg)",
-                      backgroundImage: `
-                        linear-gradient(transparent 27px, #E8E8E8 28px),
-                        linear-gradient(90deg, transparent 97%, #F8B4B4 98%, #F8B4B4 100%)
-                      `,
-                      backgroundSize: "100% 28px, 100% 100%",
-                    }}
-                  >
-                    {/* Stamp decoration */}
-                    <div className="absolute top-4 right-4 w-16 h-20 border-2 border-dashed border-vintage-red/50 flex items-center justify-center">
-                      <div className="text-center">
-                        <span className="text-2xl">&#x2702;</span>
-                        <p className="text-[0.5rem] text-vintage-red font-[family-name:var(--font-special-elite)]">
-                          SCRAP
-                          <br />
-                          SOCIETY
-                        </p>
-                      </div>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-6 pr-20">
-                      <div>
-                        <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
-                          Your Name
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formState.name}
-                          onChange={(e) =>
-                            setFormState({ ...formState, name: e.target.value })
-                          }
-                          className="w-full bg-transparent border-b-2 border-kraft focus:border-vintage-red outline-none py-2 font-[family-name:var(--font-karla)] transition-colors"
-                          placeholder="Jane Doe"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
-                          Email Address
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={formState.email}
-                          onChange={(e) =>
-                            setFormState({ ...formState, email: e.target.value })
-                          }
-                          className="w-full bg-transparent border-b-2 border-kraft focus:border-vintage-red outline-none py-2 font-[family-name:var(--font-karla)] transition-colors"
-                          placeholder="jane@example.com"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
-                          Subject
-                        </label>
-                        <select
-                          value={formState.subject}
-                          onChange={(e) =>
-                            setFormState({ ...formState, subject: e.target.value })
-                          }
-                          className="w-full bg-transparent border-b-2 border-kraft focus:border-vintage-red outline-none py-2 font-[family-name:var(--font-karla)] transition-colors cursor-pointer"
-                        >
-                          <option value="general">General Inquiry</option>
-                          <option value="register">Event Registration</option>
-                          <option value="collaborate">Collaboration</option>
-                          <option value="press">Press / Media</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block font-[family-name:var(--font-special-elite)] text-charcoal mb-2">
-                          Your Message
-                        </label>
-                        <textarea
-                          required
-                          rows={5}
-                          value={formState.message}
-                          onChange={(e) =>
-                            setFormState({ ...formState, message: e.target.value })
-                          }
-                          className="w-full bg-transparent border-2 border-kraft focus:border-vintage-red outline-none p-3 font-[family-name:var(--font-karla)] transition-colors resize-none"
-                          placeholder="Write your message here..."
-                        />
-                      </div>
-
-                      <div className="pt-4">
-                        <Button
-                          type="submit"
-                          variant="primary"
-                          size="lg"
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? "Sending..." : "Send Message &#x2709;"}
-                        </Button>
-                      </div>
-                    </form>
-
-                    {/* Decorative postmark */}
-                    <div className="absolute bottom-4 right-4 postmark">
-                      <span className="relative z-10">
-                        ROTTERDAM
-                        <br />
-                        NL
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <Card variant="paper" className="text-center py-16">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <span className="text-6xl mb-6 block">&#x2709;&#xFE0F;</span>
-                      <h2 className="font-[family-name:var(--font-special-elite)] text-2xl mb-4 text-charcoal">
-                        Message Sent!
-                      </h2>
-                      <p className="text-charcoal/70 mb-6">
-                        Thanks for reaching out! We&apos;ll get back to you soon.
-                      </p>
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          setIsSubmitted(false);
-                          setFormState({
-                            name: "",
-                            email: "",
-                            subject: "general",
-                            message: "",
-                          });
-                        }}
-                      >
-                        Send Another Message
-                      </Button>
-                    </motion.div>
-                  </Card>
-                )}
+                <Suspense fallback={<div className="h-96 bg-cream animate-pulse" />}>
+                  <ContactForm />
+                </Suspense>
               </motion.div>
 
               {/* Contact Info */}
@@ -235,10 +306,10 @@ export default function ContactPage() {
                           Email
                         </p>
                         <a
-                          href="mailto:hello@scrapsociety.nl"
+                          href="mailto:sarasaudrius@gmail.com"
                           className="text-vintage-red hover:underline text-sm"
                         >
-                          hello@scrapsociety.nl
+                          sarasaudrius@gmail.com
                         </a>
                       </div>
                     </div>

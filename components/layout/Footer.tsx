@@ -75,7 +75,7 @@ export function Footer() {
 
               {/* Email */}
               <motion.a
-                href="mailto:hello@scrapsociety.nl"
+                href="mailto:sarasaudrius@gmail.com"
                 className="w-10 h-10 bg-mustard rounded-full flex items-center justify-center text-charcoal"
                 whileHover={{ scale: 1.1, rotate: -5 }}
                 whileTap={{ scale: 0.95 }}

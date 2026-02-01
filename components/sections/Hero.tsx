@@ -72,11 +72,11 @@ export function Hero() {
           ✂️
         </motion.span>
         <motion.span
-          className="absolute top-[30%] right-[10%] text-3xl text-mustard"
+          className="absolute top-[30%] right-[10%] text-3xl gold-star"
           animate={{ rotate: [0, 10, -10, 0] }}
           transition={{ duration: 4, repeat: Infinity }}
         >
-          ⭐
+          ★
         </motion.span>
         <motion.span
           className="absolute bottom-[25%] left-[20%] text-3xl text-vintage-red"
@@ -92,6 +92,45 @@ export function Hero() {
         >
           📎
         </motion.span>
+
+        {/* Additional Instagram-inspired decorations */}
+        <motion.span
+          className="absolute top-[65%] left-[8%] text-2xl gold-star"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.8, scale: 1 }}
+          transition={{ delay: 1.2 }}
+        >
+          ★
+        </motion.span>
+        <motion.span
+          className="absolute top-[15%] right-[20%] text-xl pressed-flower-pink"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          ✿
+        </motion.span>
+        <motion.span
+          className="absolute bottom-[40%] right-[15%] text-lg pressed-flower"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          transition={{ delay: 1.1 }}
+        >
+          ❀
+        </motion.span>
+        {/* Sewing buttons */}
+        <motion.div
+          className="absolute top-[75%] right-[8%] sewing-button"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.3, type: "spring" }}
+        />
+        <motion.div
+          className="absolute top-[35%] left-[5%] sewing-button sewing-button-cream"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.4, type: "spring" }}
+        />
 
         {/* Hand-drawn style squiggles (SVG) */}
         <svg className="absolute top-[40%] left-[3%] w-24 h-24 text-charcoal/20" viewBox="0 0 100 100">

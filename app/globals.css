@@ -612,3 +612,282 @@ html {
   font-size: 1.5rem;
   transform: rotate(30deg);
 }
+
+/* === INSTAGRAM-INSPIRED ELEMENTS === */
+
+/* Denim texture background */
+.denim {
+  background-color: #4a6fa5;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.03) 2px,
+      rgba(255,255,255,0.03) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+  position: relative;
+}
+
+.denim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.denim-light {
+  background-color: #6b8fc7;
+}
+
+/* Sewing button decoration */
+.sewing-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--vintage-red);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 -2px 4px rgba(0,0,0,0.2),
+    0 2px 4px rgba(0,0,0,0.15);
+}
+
+.sewing-button::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 50%;
+}
+
+.sewing-button-cream {
+  background: var(--cream);
+}
+
+.sewing-button-cream::before {
+  border-color: var(--kraft);
+}
+
+.sewing-button-mustard {
+  background: var(--mustard);
+}
+
+/* Gold star decoration */
+.gold-star {
+  color: #d4a017;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  filter: drop-shadow(0 1px 1px rgba(212, 160, 23, 0.4));
+}
+
+/* Scattered stars animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.9); }
+}
+
+.twinkle-star {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+/* Pressed flower decoration (using CSS shapes) */
+.pressed-flower {
+  position: relative;
+  display: inline-block;
+}
+
+.pressed-flower::before {
+  content: '✿';
+  font-size: 1.5rem;
+  opacity: 0.7;
+  color: var(--sage);
+}
+
+.pressed-flower-pink::before {
+  color: #e8a4b8;
+}
+
+.pressed-flower-purple::before {
+  color: #a58ec4;
+}
+
+/* Fabric patch style */
+.fabric-patch {
+  position: relative;
+  background: var(--gingham-red);
+  padding: 1rem;
+}
+
+.fabric-patch::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 2px dashed rgba(255,255,255,0.5);
+  pointer-events: none;
+}
+
+/* Stitching decoration */
+.stitched {
+  position: relative;
+}
+
+.stitched::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--charcoal) 0px,
+    var(--charcoal) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  background-size: 16px 2px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+/* Heart decoration */
+.heart-deco::before {
+  content: '♥';
+  color: var(--vintage-red);
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+/* Layered paper effect */
+.layered-papers {
+  position: relative;
+}
+
+.layered-papers::before,
+.layered-papers::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+  box-shadow: var(--shadow-paper);
+  z-index: -1;
+}
+
+.layered-papers::before {
+  transform: rotate(-2deg) translate(-4px, 4px);
+  background: var(--kraft);
+}
+
+.layered-papers::after {
+  transform: rotate(1deg) translate(3px, 3px);
+}
+
+/* Chalky/blackboard text style */
+.chalky {
+  color: #fff;
+  text-shadow:
+    0 0 1px rgba(255,255,255,0.5),
+    0 1px 2px rgba(0,0,0,0.3);
+  letter-spacing: 0.05em;
+}
+
+/* Dotted trail decoration */
+.dotted-trail {
+  position: relative;
+}
+
+.dotted-trail::after {
+  content: '• • •';
+  position: absolute;
+  right: -3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--kraft);
+  letter-spacing: 0.25rem;
+  font-size: 0.75rem;
+}
+
+/* Ribbon banner */
+.ribbon {
+  position: relative;
+  background: var(--vintage-red);
+  color: white;
+  padding: 0.5rem 2rem;
+  font-family: var(--font-typewriter);
+  text-align: center;
+}
+
+.ribbon::before,
+.ribbon::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  border: 10px solid transparent;
+  border-top-color: #8b2f2f;
+}
+
+.ribbon::before {
+  left: 0;
+  border-left-color: #8b2f2f;
+}
+
+.ribbon::after {
+  right: 0;
+  border-right-color: #8b2f2f;
+}
+
+/* Masking tape (wider, more opaque) */
+.masking-tape {
+  background: rgba(244, 228, 186, 0.9);
+  padding: 0.75rem 1.5rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.5),
+    0 2px 4px rgba(0,0,0,0.1);
+  transform: rotate(-1deg);
+}
+
+/* Ticket stub style */
+.ticket-stub {
+  position: relative;
+  background: var(--cream);
+  padding: 1rem 1.5rem;
+  border: 2px dashed var(--kraft);
+}
+
+.ticket-stub::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: var(--background);
+  border-radius: 50%;
+  border: 2px dashed var(--kraft);
+}
+
+.ticket-stub::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: var(--background);
+  border-radius: 50%;
+  border: 2px dashed var(--kraft);
+}
