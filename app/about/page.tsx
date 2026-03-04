@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -92,8 +93,13 @@ export default function AboutPage() {
                   </p>
                 </div>
                 <div className="polaroid" style={{ transform: "rotate(2deg)" }}>
-                  <div className="aspect-square bg-gradient-to-br from-tape-pink to-sage/30 flex items-center justify-center">
-                    <span className="text-6xl">&#x2665;</span>
+                  <div className="aspect-square relative overflow-hidden">
+                    <Image
+                      src="/images/scrapsociety1.jpeg"
+                      alt="Scrap Society crafting session"
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                   <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
                     Made with love

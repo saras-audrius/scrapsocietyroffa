@@ -6,6 +6,7 @@ export interface Event {
   location: string;
   description: string;
   image?: string;
+  images?: string[];
   registrationOpen: boolean;
   spotsLeft?: number;
 }
@@ -49,11 +50,12 @@ export const upcomingEvents: Event[] = [
 export const pastEvents: Event[] = [
   {
     id: "past-1",
-    title: "Summer Scrap Session",
-    date: "August 2024",
+    title: "Punchcard Party",
+    date: "January 2026",
     time: "2pm - 5pm",
-    location: "Craft Park Rotterdam",
-    description: "Our outdoor summer special at Craft Park!",
+    location: "Central Library, Rotterdam",
+    description: "Our first punchcard crafting session of 2026!",
+    images: ["/images/punchcard1.jpeg", "/images/punchcard2.jpeg"],
     registrationOpen: false,
   },
   {
