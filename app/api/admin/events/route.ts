@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     registrationOpen: body.registrationOpen ?? true,
     spotsLeft: body.spotsLeft,
     images: body.images ?? [],
+    tikkieUrl: body.tikkieUrl || undefined,
   };
 
   events.unshift(newEvent);

@@ -13,6 +13,7 @@ const emptyForm = (): Omit<Event, "id"> => ({
   registrationOpen: true,
   spotsLeft: undefined,
   images: [],
+  tikkieUrl: "",
 });
 
 export default function AdminEventsPage() {
@@ -23,6 +24,7 @@ export default function AdminEventsPage() {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -84,13 +86,23 @@ export default function AdminEventsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
-    setForm((prev) => ({ ...prev, images: [...prev.images, url] }));
-    setUploading(false);
-    if (fileRef.current) fileRef.current.value = "";
+    setUploadError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `Upload failed (${res.status})`);
+      }
+      const { url } = await res.json();
+      setForm((prev) => ({ ...prev, images: [...prev.images, url] }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   }
 
   function removeImage(url: string) {
@@ -162,6 +174,15 @@ export default function AdminEventsPage() {
                 placeholder="Leave empty for unlimited"
               />
             </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Tikkie link <span className="font-normal text-gray-400">(optional — for contributions)</span></label>
+              <input
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value={form.tikkieUrl ?? ""}
+                onChange={(e) => setForm({ ...form, tikkieUrl: e.target.value })}
+                placeholder="https://tikkie.me/pay/..."
+              />
+            </div>
             <div className="flex items-center gap-6 pt-5">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -223,6 +244,7 @@ export default function AdminEventsPage() {
                 disabled={uploading}
               />
             </label>
+            {uploadError && <p className="text-red-500 text-xs mt-1">{uploadError}</p>}
           </div>
 
           <div className="flex gap-3 pt-2">
@@ -253,7 +275,11 @@ export default function AdminEventsPage() {
       ) : (
         <div className="space-y-3">
           {events.map((event) => (
-            <div key={event.id} className="bg-white rounded-2xl border border-gray-200 p-5 flex items-start gap-4">
+            <div
+              key={event.id}
+              onClick={() => startEdit(event)}
+              className="bg-white rounded-2xl border border-gray-200 p-5 flex items-start gap-4 cursor-pointer hover:border-amber-300 hover:shadow-sm transition"
+            >
               {event.images[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={event.images[0]} alt="" className="w-16 h-16 object-cover rounded-xl flex-shrink-0" />
@@ -271,20 +297,15 @@ export default function AdminEventsPage() {
                   )}
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">{event.date}{event.time ? ` · ${event.time}` : ""}{event.location ? ` · ${event.location}` : ""}</p>
+                {event.tikkieUrl && <span className="text-xs text-[#009FE3] mt-0.5 inline-block">💙 Tikkie set</span>}
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                 <button
                   onClick={() => handleToggle(event, "isPast")}
                   className="text-xs text-gray-400 hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 transition"
                   title={event.isPast ? "Mark as upcoming" : "Mark as past"}
                 >
                   {event.isPast ? "↑ Upcoming" : "↓ Past"}
-                </button>
-                <button
-                  onClick={() => startEdit(event)}
-                  className="text-xs text-gray-400 hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 transition"
-                >
-                  Edit
                 </button>
                 <button
                   onClick={() => handleDelete(event.id)}

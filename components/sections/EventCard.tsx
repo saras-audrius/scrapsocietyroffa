@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Event } from "@/lib/events";
 import { Button } from "../ui/Button";
@@ -12,16 +13,18 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, index = 0 }: EventCardProps) {
+  const router = useRouter();
   const rotations = [-2, 1, -1, 2, -1.5];
   const bgColors = ["bg-cream", "bg-white", "bg-tape-yellow/30"];
 
   return (
     <motion.article
-      className={`relative ${bgColors[index % bgColors.length]} p-6 shadow-[var(--shadow-paper)]`}
+      className={`relative ${bgColors[index % bgColors.length]} p-6 shadow-[var(--shadow-paper)] cursor-pointer`}
       style={{ transform: `rotate(${rotations[index % rotations.length]}deg)` }}
       variants={cardTilt}
       initial="initial"
       whileHover="hover"
+      onClick={() => router.push(`/events/${event.id}`)}
     >
       {/* Decorative tape at top */}
       <div
@@ -56,7 +59,7 @@ export function EventCard({ event, index = 0 }: EventCardProps) {
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
           {event.registrationOpen ? (
             <Link href={`/contact?event=${event.id}`}>
               <Button variant="primary" size="sm">

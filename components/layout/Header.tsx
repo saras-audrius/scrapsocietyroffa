@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { WashiTape } from "../ui/WashiTape";
@@ -14,6 +14,13 @@ const navItems = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/logo")
+      .then((r) => r.json())
+      .then((data) => { if (data.url) setLogoUrl(data.url); });
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur-sm">
@@ -25,13 +32,20 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <motion.div
-              className="w-14 h-14 rounded-full gingham flex items-center justify-center border-4 border-white shadow-md"
+              className="w-14 h-14 rounded-full border-4 border-white shadow-md overflow-hidden flex items-center justify-center"
               whileHover={{ rotate: 10, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 400 }}
             >
-              <span className="font-[family-name:var(--font-special-elite)] text-charcoal text-xs text-center leading-tight">
-                Scrap<br />Society
-              </span>
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt="Scrap Society" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full gingham flex items-center justify-center">
+                  <span className="font-[family-name:var(--font-special-elite)] text-charcoal text-xs text-center leading-tight">
+                    Scrap<br />Society
+                  </span>
+                </div>
+              )}
             </motion.div>
             <div className="hidden sm:block">
               <h1 className="font-[family-name:var(--font-special-elite)] text-xl text-charcoal">

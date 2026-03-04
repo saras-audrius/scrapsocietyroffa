@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const SECTIONS = [
   {
@@ -64,12 +64,49 @@ export default function AdminContentPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoError, setLogoError] = useState("");
+  const logoFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/admin/content")
       .then((r) => r.json())
       .then((data) => { setContent(data); setLoading(false); });
   }, []);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoUploading(true);
+    setLogoError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+      const { url } = await res.json();
+      await fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "site:logo", value: url }),
+      });
+      setContent((prev) => ({ ...prev, "site:logo": url }));
+    } catch (err) {
+      setLogoError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setLogoUploading(false);
+      if (logoFileRef.current) logoFileRef.current.value = "";
+    }
+  }
+
+  async function handleRemoveLogo() {
+    await fetch("/api/admin/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: "site:logo", value: "" }),
+    });
+    setContent((prev) => ({ ...prev, "site:logo": "" }));
+  }
 
   async function handleSave(key: string) {
     setSaving(key);
@@ -94,6 +131,35 @@ export default function AdminContentPage() {
         <p className="text-sm text-gray-500 mt-1">
           Edit text sections across the site. Changes take effect on the next page load.
         </p>
+      </div>
+
+      {/* Logo upload */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5">
+        <label className="block font-medium text-gray-700 text-sm mb-0.5">Site Logo</label>
+        <p className="text-xs text-gray-400 mb-4">Shown in the top-left corner of every page. Leave empty to use the default text badge.</p>
+        <div className="flex items-center gap-4">
+          {content["site:logo"] ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={content["site:logo"]} alt="Logo" className="w-14 h-14 rounded-full object-cover border-2 border-gray-200" />
+              <div className="flex gap-2">
+                <label className="cursor-pointer inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition">
+                  {logoUploading ? "Uploading..." : "Replace"}
+                  <input ref={logoFileRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={logoUploading} />
+                </label>
+                <button onClick={handleRemoveLogo} className="text-sm text-red-400 hover:text-red-600 border border-gray-200 rounded-lg px-3 py-1.5 transition">
+                  Remove
+                </button>
+              </div>
+            </>
+          ) : (
+            <label className="cursor-pointer inline-flex items-center gap-2 border border-dashed border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-500 hover:border-amber-400 hover:text-amber-600 transition">
+              {logoUploading ? "Uploading..." : "+ Upload logo"}
+              <input ref={logoFileRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={logoUploading} />
+            </label>
+          )}
+        </div>
+        {logoError && <p className="text-red-500 text-xs mt-2">{logoError}</p>}
       </div>
 
       <div className="space-y-4">
