@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -7,11 +8,30 @@ import { Hero } from "@/components/sections/Hero";
 import { EventCard } from "@/components/sections/EventCard";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { upcomingEvents } from "@/lib/events";
+import type { Event } from "@/lib/kv";
 import { staggerContainer, fadeInUp } from "@/components/animations/variants";
 import Link from "next/link";
 
 export default function Home() {
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    fetch("/api/events")
+      .then((r) => r.json())
+      .then((data: Event[]) => {
+        const today = new Date().toISOString().split("T")[0];
+        const filtered = data
+          .filter((e) => (e.dateISO ? e.dateISO >= today : !e.isPast))
+          .sort((a, b) => {
+            if (a.dateISO && b.dateISO) return a.dateISO.localeCompare(b.dateISO);
+            if (a.dateISO) return -1;
+            if (b.dateISO) return 1;
+            return 0;
+          })
+          .slice(0, 3);
+        setUpcomingEvents(filtered);
+      });
+  }, []);
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

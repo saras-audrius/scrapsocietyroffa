@@ -7,7 +7,15 @@ export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
   const allEvents = await getEvents();
-  const upcomingEvents = allEvents.filter((e) => !e.isPast);
+  const today = new Date().toISOString().split("T")[0];
+  const upcomingEvents = allEvents
+    .filter((e) => (e.dateISO ? e.dateISO >= today : !e.isPast))
+    .sort((a, b) => {
+      if (a.dateISO && b.dateISO) return a.dateISO.localeCompare(b.dateISO);
+      if (a.dateISO) return -1;
+      if (b.dateISO) return 1;
+      return 0;
+    });
   const pastEvents = allEvents.filter((e) => e.isPast);
 
   return (

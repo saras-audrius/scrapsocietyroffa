@@ -3,7 +3,8 @@ import { kv } from "@vercel/kv";
 export interface Event {
   id: string;
   title: string;
-  date: string;
+  date: string;      // Human-readable, e.g. "8th March 2026"
+  dateISO?: string;  // YYYY-MM-DD for sorting/filtering, e.g. "2026-03-08"
   time: string;
   location: string;
   description: string;

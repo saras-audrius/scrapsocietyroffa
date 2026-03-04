@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Event } from "@/lib/events";
+import { Event } from "@/lib/kv";
 import { Button } from "../ui/Button";
 import { cardTilt } from "../animations/variants";
 import Link from "next/link";

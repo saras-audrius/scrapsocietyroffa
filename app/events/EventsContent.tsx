@@ -71,19 +71,7 @@ export function EventsContent({
               >
                 {upcomingEvents.map((event, i) => (
                   <motion.div key={event.id} variants={fadeInUp}>
-                    <EventCard
-                      event={{
-                        id: event.id,
-                        title: event.title,
-                        date: event.date,
-                        time: event.time,
-                        location: event.location,
-                        description: event.description,
-                        registrationOpen: event.registrationOpen,
-                        spotsLeft: event.spotsLeft,
-                      }}
-                      index={i}
-                    />
+                    <EventCard event={event} index={i} />
                   </motion.div>
                 ))}
               </motion.div>

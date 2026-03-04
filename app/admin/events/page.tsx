@@ -6,6 +6,7 @@ import type { Event } from "@/lib/kv";
 const emptyForm = (): Omit<Event, "id"> => ({
   title: "",
   date: "",
+  dateISO: "",
   time: "",
   location: "",
   description: "",
@@ -144,6 +145,15 @@ export default function AdminEventsPage() {
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
                 placeholder="1st February"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Date <span className="font-normal text-gray-400">(for sorting & filtering)</span></label>
+              <input
+                type="date"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value={form.dateISO ?? ""}
+                onChange={(e) => setForm({ ...form, dateISO: e.target.value })}
               />
             </div>
             <div>

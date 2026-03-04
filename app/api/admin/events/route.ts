@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     registrationOpen: body.registrationOpen ?? true,
     spotsLeft: body.spotsLeft,
     images: body.images ?? [],
+    dateISO: body.dateISO || undefined,
     tikkieUrl: body.tikkieUrl || undefined,
   };
 
