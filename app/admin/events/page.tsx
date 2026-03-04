@@ -19,6 +19,7 @@ export default function AdminEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Event | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -33,11 +34,13 @@ export default function AdminEventsPage() {
   function startNew() {
     setEditing(null);
     setForm(emptyForm());
+    setFormOpen(true);
   }
 
   function startEdit(event: Event) {
     setEditing(event);
     setForm({ ...event });
+    setFormOpen(true);
   }
 
   async function handleSave() {
@@ -57,6 +60,7 @@ export default function AdminEventsPage() {
     }
     setEditing(null);
     setForm(emptyForm());
+    setFormOpen(false);
     setSaving(false);
   }
 
@@ -93,7 +97,6 @@ export default function AdminEventsPage() {
     setForm((prev) => ({ ...prev, images: prev.images.filter((u) => u !== url) }));
   }
 
-  const showForm = editing !== null || form.title !== "" || form.date !== "";
 
   return (
     <div className="space-y-6">
@@ -108,7 +111,7 @@ export default function AdminEventsPage() {
       </div>
 
       {/* Form */}
-      {(showForm || editing) && (
+      {formOpen && (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-semibold text-gray-700">{editing ? "Edit event" : "New event"}</h2>
 
@@ -231,7 +234,7 @@ export default function AdminEventsPage() {
               {saving ? "Saving..." : "Save event"}
             </button>
             <button
-              onClick={() => { setEditing(null); setForm(emptyForm()); }}
+              onClick={() => { setEditing(null); setForm(emptyForm()); setFormOpen(false); }}
               className="text-gray-500 hover:text-gray-700 px-4 py-2 text-sm transition"
             >
               Cancel
