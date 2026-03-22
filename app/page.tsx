@@ -149,7 +149,7 @@ export default function Home() {
                     >
                       <div className={`w-28 h-28 relative overflow-hidden ${!photoUrl ? `bg-gradient-to-br ${item.bg} flex items-center justify-center` : ""}`}>
                         {photoUrl ? (
-                          <Image src={photoUrl} alt={item.label} fill className="object-cover" />
+                          <Image src={photoUrl} alt={item.defaultLabel} fill className="object-cover" />
                         ) : (
                           <span className="text-4xl">{item.icon}</span>
                         )}
