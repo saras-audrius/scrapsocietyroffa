@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { EventCard } from "@/components/sections/EventCard";
 import { Card } from "@/components/ui/Card";
 import { CutoutText } from "@/components/ui/CutoutText";
@@ -90,55 +91,6 @@ export function EventsContent({
         </div>
       </section>
 
-      {/* How to Register Section */}
-      <section className="py-16 bg-gingham">
-        <div className="max-w-4xl mx-auto px-4">
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <Card variant="paper" className="p-8 md:p-12">
-              <motion.div variants={fadeInUp} className="text-center">
-                <h2 className="font-[family-name:var(--font-special-elite)] text-2xl mb-6 text-charcoal">
-                  How to Join
-                </h2>
-                <div className="grid sm:grid-cols-3 gap-6 text-left">
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-vintage-red text-white rounded-full flex items-center justify-center mx-auto mb-3 font-[family-name:var(--font-special-elite)] text-xl">
-                      1
-                    </div>
-                    <h3 className="font-[family-name:var(--font-special-elite)] mb-2">Pick an Event</h3>
-                    <p className="text-sm text-charcoal/70">Choose a session that fits your schedule</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-mustard text-charcoal rounded-full flex items-center justify-center mx-auto mb-3 font-[family-name:var(--font-special-elite)] text-xl">
-                      2
-                    </div>
-                    <h3 className="font-[family-name:var(--font-special-elite)] mb-2">Register</h3>
-                    <p className="text-sm text-charcoal/70">Click register and fill out the form</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-sage text-charcoal rounded-full flex items-center justify-center mx-auto mb-3 font-[family-name:var(--font-special-elite)] text-xl">
-                      3
-                    </div>
-                    <h3 className="font-[family-name:var(--font-special-elite)] mb-2">Show Up & Create</h3>
-                    <p className="text-sm text-charcoal/70">Bring scissors, glue, and your creativity!</p>
-                  </div>
-                </div>
-                <div className="mt-8 p-4 bg-tape-yellow/30 rounded">
-                  <p className="text-sm text-charcoal/80">
-                    <strong>Note:</strong> Sessions are free or donation-based.
-                    Space is limited, so please register in advance!
-                  </p>
-                </div>
-              </motion.div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Past Events Section */}
       {pastEvents.length > 0 && (
         <section className="py-16">
@@ -170,17 +122,41 @@ export function EventsContent({
                         variants={fadeInUp}
                         className="group"
                       >
+                        <Link href={`/events/${event.id}`} className="block">
+                          <div
+                            className="polaroid transition-transform duration-200 group-hover:scale-105"
+                            style={{ transform: `rotate(${ROTATIONS[(i + j) % 4]}deg)` }}
+                          >
+                            <div className="aspect-square relative overflow-hidden">
+                              <Image
+                                src={src}
+                                alt={`${event.title} - photo ${j + 1}`}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform"
+                              />
+                            </div>
+                            <div className="mt-2 text-center">
+                              <p className="font-[family-name:var(--font-special-elite)] text-sm">
+                                {event.title}
+                              </p>
+                              <p className="text-xs text-charcoal/60">{event.date}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ));
+                  }
+                  return (
+                    <motion.div key={event.id} variants={fadeInUp} className="group">
+                      <Link href={`/events/${event.id}`} className="block">
                         <div
-                          className="polaroid"
-                          style={{ transform: `rotate(${ROTATIONS[(i + j) % 4]}deg)` }}
+                          className="polaroid transition-transform duration-200 group-hover:scale-105"
+                          style={{ transform: `rotate(${ROTATIONS[i % 4]}deg)` }}
                         >
-                          <div className="aspect-square relative overflow-hidden">
-                            <Image
-                              src={src}
-                              alt={`${event.title} - photo ${j + 1}`}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform"
-                            />
+                          <div className="aspect-square bg-gradient-to-br from-kraft/50 to-tape-yellow/30 flex items-center justify-center">
+                            <span className="text-4xl group-hover:scale-110 transition-transform">
+                              &#x1F4F8;
+                            </span>
                           </div>
                           <div className="mt-2 text-center">
                             <p className="font-[family-name:var(--font-special-elite)] text-sm">
@@ -189,27 +165,7 @@ export function EventsContent({
                             <p className="text-xs text-charcoal/60">{event.date}</p>
                           </div>
                         </div>
-                      </motion.div>
-                    ));
-                  }
-                  return (
-                    <motion.div key={event.id} variants={fadeInUp} className="group">
-                      <div
-                        className="polaroid"
-                        style={{ transform: `rotate(${ROTATIONS[i % 4]}deg)` }}
-                      >
-                        <div className="aspect-square bg-gradient-to-br from-kraft/50 to-tape-yellow/30 flex items-center justify-center">
-                          <span className="text-4xl group-hover:scale-110 transition-transform">
-                            &#x1F4F8;
-                          </span>
-                        </div>
-                        <div className="mt-2 text-center">
-                          <p className="font-[family-name:var(--font-special-elite)] text-sm">
-                            {event.title}
-                          </p>
-                          <p className="text-xs text-charcoal/60">{event.date}</p>
-                        </div>
-                      </div>
+                      </Link>
                     </motion.div>
                   );
                 })}
