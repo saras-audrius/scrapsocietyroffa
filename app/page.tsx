@@ -134,7 +134,7 @@ export default function Home() {
                   const label = homePhotos[item.labelKey] || item.defaultLabel;
                   return (
                     <motion.div
-                      key={item.label}
+                      key={item.defaultLabel}
                       className="polaroid absolute"
                       style={{
                         top: item.top,
