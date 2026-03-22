@@ -9,6 +9,7 @@ const navItems = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/events", label: "Events" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -65,8 +66,8 @@ export function Header() {
                   transition={{ delay: i * 0.1 }}
                 >
                   <WashiTape
-                    color={["yellow", "pink", "mint", "yellow"][i] as "yellow" | "pink" | "mint"}
-                    rotation={[-2, 1, -1, 2][i]}
+                    color={["yellow", "pink", "mint", "yellow", "pink"][i] as "yellow" | "pink" | "mint"}
+                    rotation={[-2, 1, -1, 2, -1][i]}
                   >
                     {item.label}
                   </WashiTape>

@@ -28,6 +28,8 @@ export default function AdminEventsPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const dragIndexRef = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/events")
@@ -105,6 +107,37 @@ export default function AdminEventsPage() {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
+  }
+
+  function handleDragStart(index: number) {
+    dragIndexRef.current = index;
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    setDragOverIndex(index);
+  }
+
+  function handleDrop(dropIndex: number) {
+    const from = dragIndexRef.current;
+    if (from === null || from === dropIndex) {
+      dragIndexRef.current = null;
+      setDragOverIndex(null);
+      return;
+    }
+    setForm((prev) => {
+      const imgs = [...prev.images];
+      const [moved] = imgs.splice(from, 1);
+      imgs.splice(dropIndex, 0, moved);
+      return { ...prev, images: imgs };
+    });
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
+  }
+
+  function handleDragEnd() {
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
   }
 
   function removeImage(url: string) {
@@ -234,14 +267,25 @@ export default function AdminEventsPage() {
           {/* Image upload */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Photos</label>
-            <p className="text-xs text-gray-400 mb-2">Click the ★ on a photo to set it as the cover image shown on the events listing page.</p>
+            <p className="text-xs text-gray-400 mb-2">
+              Drag to reorder. Click <strong>★</strong> to set the cover shown on the events listing page.
+            </p>
             <div className="flex flex-wrap gap-2 mb-2">
-              {form.images.map((url) => {
+              {form.images.map((url, idx) => {
                 const isCover = (form.coverImage ?? form.images[0]) === url;
+                const isDragTarget = dragOverIndex === idx;
                 return (
-                  <div key={url} className="relative group">
+                  <div
+                    key={url}
+                    className={`relative group cursor-grab active:cursor-grabbing transition-all ${isDragTarget ? "ring-2 ring-amber-400 ring-offset-1 scale-105" : ""}`}
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragOver={(e) => handleDragOver(e, idx)}
+                    onDrop={() => handleDrop(idx)}
+                    onDragEnd={handleDragEnd}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" className={`w-20 h-20 object-cover rounded-lg border-2 transition ${isCover ? "border-amber-400" : "border-transparent"}`} />
+                    <img src={url} alt="" className={`w-20 h-20 object-cover rounded-lg border-2 transition select-none ${isCover ? "border-amber-400" : "border-transparent"}`} />
                     {/* Cover star */}
                     <button
                       onClick={() => setForm((prev) => ({ ...prev, coverImage: url }))}
