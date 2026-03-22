@@ -125,12 +125,13 @@ export default function Home() {
                 variants={fadeInUp}
               >
                 {[
-                  { icon: "✂️", label: "Cutting & pasting", bg: "from-tape-pink to-tape-yellow", rotate: -8, top: "0%", left: "10%", key: "home:polaroid:0" },
-                  { icon: "📖", label: "Zine making", bg: "from-sage/50 to-tape-mint", rotate: 6, top: "5%", left: "55%", key: "home:polaroid:1" },
-                  { icon: "💕", label: "Community", bg: "from-mustard/50 to-vintage-red/30", rotate: -4, top: "45%", left: "5%", key: "home:polaroid:2" },
-                  { icon: "⭐", label: "Creativity", bg: "from-tape-mint to-sage/50", rotate: 8, top: "50%", left: "50%", key: "home:polaroid:3" },
+                  { icon: "✂️", defaultLabel: "Cutting & pasting", bg: "from-tape-pink to-tape-yellow", rotate: -8, top: "0%", left: "10%", key: "home:polaroid:0", labelKey: "home:polaroid:label:0" },
+                  { icon: "📖", defaultLabel: "Zine making", bg: "from-sage/50 to-tape-mint", rotate: 6, top: "5%", left: "55%", key: "home:polaroid:1", labelKey: "home:polaroid:label:1" },
+                  { icon: "💕", defaultLabel: "Community", bg: "from-mustard/50 to-vintage-red/30", rotate: -4, top: "45%", left: "5%", key: "home:polaroid:2", labelKey: "home:polaroid:label:2" },
+                  { icon: "⭐", defaultLabel: "Creativity", bg: "from-tape-mint to-sage/50", rotate: 8, top: "50%", left: "50%", key: "home:polaroid:3", labelKey: "home:polaroid:label:3" },
                 ].map((item, i) => {
                   const photoUrl = homePhotos[item.key];
+                  const label = homePhotos[item.labelKey] || item.defaultLabel;
                   return (
                     <motion.div
                       key={item.label}
@@ -154,7 +155,7 @@ export default function Home() {
                         )}
                       </div>
                       <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
-                        {item.label}
+                        {label}
                       </p>
                       {i % 2 === 0 && (
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-tape-mint/80 rotate-2" />

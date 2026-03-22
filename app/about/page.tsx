@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
@@ -9,6 +10,14 @@ import { CutoutText } from "@/components/ui/CutoutText";
 import { staggerContainer, fadeInUp } from "@/components/animations/variants";
 
 export default function AboutPage() {
+  const [aboutPhotos, setAboutPhotos] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/admin/content")
+      .then((r) => r.json())
+      .then((data: Record<string, string>) => setAboutPhotos(data));
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -85,8 +94,14 @@ export default function AboutPage() {
 
               <motion.div variants={fadeInUp} className="md:col-span-2 space-y-4">
                 <div className="polaroid" style={{ transform: "rotate(-3deg)" }}>
-                  <div className="aspect-square bg-gradient-to-br from-vintage-red/20 to-mustard/30 flex items-center justify-center">
-                    <span className="text-6xl">&#x2702;</span>
+                  <div className="aspect-square relative overflow-hidden">
+                    {aboutPhotos["about:photo:0"] ? (
+                      <Image src={aboutPhotos["about:photo:0"]} alt="Scrap Society" fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-vintage-red/20 to-mustard/30 flex items-center justify-center">
+                        <span className="text-6xl">&#x2702;</span>
+                      </div>
+                    )}
                   </div>
                   <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
                     Est. 2020
@@ -95,7 +110,7 @@ export default function AboutPage() {
                 <div className="polaroid" style={{ transform: "rotate(2deg)" }}>
                   <div className="aspect-square relative overflow-hidden">
                     <Image
-                      src="/images/scrapsociety1.jpeg"
+                      src={aboutPhotos["about:photo:1"] || "/images/scrapsociety1.jpeg"}
                       alt="Scrap Society crafting session"
                       fill
                       className="object-cover"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Special_Elite, Karla } from "next/font/google";
 import "./globals.css";
 import { SplashOverlay } from "@/components/splash/SplashOverlay";
+import { Analytics } from "@vercel/analytics/next";
 
 const specialElite = Special_Elite({
   weight: "400",
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body className={`${specialElite.variable} ${karla.variable} antialiased`} suppressHydrationWarning>
         <SplashOverlay />
         {children}
+        <Analytics />
       </body>
     </html>
   );

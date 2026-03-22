@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 
 const HOME_POLAROIDS = [
-  { key: "home:polaroid:0", label: "Cutting & pasting" },
-  { key: "home:polaroid:1", label: "Zine making" },
-  { key: "home:polaroid:2", label: "Community" },
-  { key: "home:polaroid:3", label: "Creativity" },
+  { key: "home:polaroid:0", labelKey: "home:polaroid:label:0", defaultLabel: "Cutting & pasting" },
+  { key: "home:polaroid:1", labelKey: "home:polaroid:label:1", defaultLabel: "Zine making" },
+  { key: "home:polaroid:2", labelKey: "home:polaroid:label:2", defaultLabel: "Community" },
+  { key: "home:polaroid:3", labelKey: "home:polaroid:label:3", defaultLabel: "Creativity" },
 ];
 
 const SECTIONS = [
@@ -144,6 +144,16 @@ export default function AdminContentPage() {
     }
   }
 
+  async function handlePolaroidLabelSave(labelKey: string) {
+    await fetch("/api/admin/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: labelKey, value: content[labelKey] ?? "" }),
+    });
+    setSaved(labelKey);
+    setTimeout(() => setSaved(null), 2000);
+  }
+
   async function handlePolaroidRemove(key: string) {
     await fetch("/api/admin/content", {
       method: "PUT",
@@ -213,23 +223,25 @@ export default function AdminContentPage() {
         <p className="text-xs text-gray-400 mb-4">
           Upload a photo for each polaroid in the &quot;What is Scrap Society?&quot; section on the home page. Leave empty to show the default icon.
         </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
           {HOME_POLAROIDS.map((slot) => {
             const url = content[slot.key];
             const isUploading = polaroidUploading === slot.key;
+            const labelValue = content[slot.labelKey] ?? "";
             return (
-              <div key={slot.key} className="flex flex-col items-center gap-2">
-                <div className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
+              <div key={slot.key} className="flex flex-col gap-2">
+                {/* Photo thumbnail */}
+                <div className="w-full aspect-square rounded-lg border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
                   {url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={url} alt={slot.label} className="w-full h-full object-cover" />
+                    <img src={url} alt={slot.defaultLabel} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs text-gray-400 text-center px-1">{slot.label}</span>
+                    <span className="text-xs text-gray-400 text-center px-2">{slot.defaultLabel}</span>
                   )}
                 </div>
-                <p className="text-xs font-medium text-gray-600 text-center">{slot.label}</p>
-                <div className="flex flex-col gap-1 w-full">
-                  <label className="cursor-pointer text-center text-xs bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded-lg transition">
+                {/* Photo actions */}
+                <div className="flex gap-1">
+                  <label className="flex-1 cursor-pointer text-center text-xs bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded-lg transition">
                     {isUploading ? "..." : url ? "Replace" : "+ Photo"}
                     <input
                       ref={(el) => { polaroidFileRefs.current[slot.key] = el; }}
@@ -243,9 +255,78 @@ export default function AdminContentPage() {
                   {url && (
                     <button
                       onClick={() => handlePolaroidRemove(slot.key)}
-                      className="text-xs text-red-400 hover:text-red-600 transition"
+                      className="text-xs text-gray-400 hover:text-red-500 border border-gray-200 rounded-lg px-2 py-1 transition"
                     >
-                      Remove
+                      ×
+                    </button>
+                  )}
+                </div>
+                {/* Label text */}
+                <div className="flex gap-1">
+                  <input
+                    className="flex-1 border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    value={labelValue}
+                    onChange={(e) => setContent((prev) => ({ ...prev, [slot.labelKey]: e.target.value }))}
+                    placeholder={slot.defaultLabel}
+                  />
+                  <button
+                    onClick={() => handlePolaroidLabelSave(slot.labelKey)}
+                    className="text-xs bg-gray-100 hover:bg-amber-100 text-gray-600 hover:text-amber-700 rounded-lg px-2 py-1 transition"
+                  >
+                    {saved === slot.labelKey ? "✓" : "Save"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {polaroidError && <p className="text-red-500 text-xs mt-3">{polaroidError}</p>}
+      </div>
+
+      {/* Other page photos */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5">
+        <label className="block font-medium text-gray-700 text-sm mb-0.5">Other Page Photos</label>
+        <p className="text-xs text-gray-400 mb-4">
+          Upload photos for the floating polaroids on the home page hero and the about page.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+          {[
+            { key: "home:hero:photo:left",  caption: "Home hero — left",  hint: "get creative!" },
+            { key: "home:hero:photo:right", caption: "Home hero — right", hint: "make magic" },
+            { key: "about:photo:0",         caption: "About — top photo",    hint: "Est. 2020" },
+            { key: "about:photo:1",         caption: "About — bottom photo", hint: "Made with love" },
+          ].map((slot) => {
+            const url = content[slot.key];
+            const isUploading = polaroidUploading === slot.key;
+            return (
+              <div key={slot.key} className="flex flex-col gap-2">
+                <div className="w-full aspect-square rounded-lg border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
+                  {url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={url} alt={slot.caption} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs text-gray-400 text-center px-2">{slot.hint}</span>
+                  )}
+                </div>
+                <p className="text-xs font-medium text-gray-600">{slot.caption}</p>
+                <div className="flex gap-1">
+                  <label className="flex-1 cursor-pointer text-center text-xs bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded-lg transition">
+                    {isUploading ? "..." : url ? "Replace" : "+ Photo"}
+                    <input
+                      ref={(el) => { polaroidFileRefs.current[slot.key] = el; }}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handlePolaroidUpload(e, slot.key)}
+                      disabled={isUploading}
+                    />
+                  </label>
+                  {url && (
+                    <button
+                      onClick={() => handlePolaroidRemove(slot.key)}
+                      className="text-xs text-gray-400 hover:text-red-500 border border-gray-200 rounded-lg px-2 py-1 transition"
+                    >
+                      ×
                     </button>
                   )}
                 </div>
@@ -253,7 +334,6 @@ export default function AdminContentPage() {
             );
           })}
         </div>
-        {polaroidError && <p className="text-red-500 text-xs mt-3">{polaroidError}</p>}
       </div>
 
       <div className="space-y-4">

@@ -1,11 +1,20 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { staggerContainer, fadeInUp } from "../animations/variants";
 import Link from "next/link";
 
 export function Hero() {
+  const [heroPhotos, setHeroPhotos] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/admin/content")
+      .then((r) => r.json())
+      .then((data: Record<string, string>) => setHeroPhotos(data));
+  }, []);
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Layered paper background - like a collage board */}
@@ -255,8 +264,14 @@ export function Hero() {
           transition={{ delay: 1, duration: 0.6 }}
           whileHover={{ rotate: 0, scale: 1.05 }}
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-tape-pink to-tape-yellow flex items-center justify-center">
-            <span className="text-3xl">🎨</span>
+          <div className="w-24 h-24 relative overflow-hidden">
+            {heroPhotos["home:hero:photo:left"] ? (
+              <Image src={heroPhotos["home:hero:photo:left"]} alt="get creative" fill className="object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-tape-pink to-tape-yellow flex items-center justify-center">
+                <span className="text-3xl">🎨</span>
+              </div>
+            )}
           </div>
           <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
             get creative!
@@ -270,8 +285,14 @@ export function Hero() {
           transition={{ delay: 1.2, duration: 0.6 }}
           whileHover={{ rotate: 0, scale: 1.05 }}
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-sage/50 to-tape-mint flex items-center justify-center">
-            <span className="text-3xl">✨</span>
+          <div className="w-24 h-24 relative overflow-hidden">
+            {heroPhotos["home:hero:photo:right"] ? (
+              <Image src={heroPhotos["home:hero:photo:right"]} alt="make magic" fill className="object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-sage/50 to-tape-mint flex items-center justify-center">
+                <span className="text-3xl">✨</span>
+              </div>
+            )}
           </div>
           <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
             make magic
