@@ -43,39 +43,40 @@ export default async function EventDetailPage({ params }: Props) {
               style={{ transform: "rotate(-1deg)" }}
             />
 
-            {/* Title row — text left, cover photo right */}
-            <div className="flex gap-6 items-start mb-6">
-              <div className="flex-1 min-w-0">
-                <h1 className="font-[family-name:var(--font-special-elite)] text-3xl text-charcoal mb-4">
-                  {event.title}
-                </h1>
-                <div className="space-y-2 text-sm text-charcoal/80">
-                  <p className="flex items-center gap-2">
-                    <span className="text-vintage-red">&#x2702;</span>
-                    {event.date}{event.time ? ` • ${event.time}` : ""}
-                  </p>
-                  {event.location && (
-                    <p className="flex items-center gap-2">
-                      <span className="text-vintage-red">&#x2691;</span>
-                      {event.location}
-                    </p>
-                  )}
-                </div>
-              </div>
-              {(() => {
-                const cover = event.coverImage ?? event.images[0];
-                return cover ? (
+            {/* Title */}
+            <h1 className="font-[family-name:var(--font-special-elite)] text-3xl text-charcoal mb-4">
+              {event.title}
+            </h1>
+
+            <div className="space-y-2 mb-6 text-sm text-charcoal/80">
+              <p className="flex items-center gap-2">
+                <span className="text-vintage-red">&#x2702;</span>
+                {event.date}{event.time ? ` • ${event.time}` : ""}
+              </p>
+              {event.location && (
+                <p className="flex items-center gap-2">
+                  <span className="text-vintage-red">&#x2691;</span>
+                  {event.location}
+                </p>
+              )}
+            </div>
+
+            {/* Cover photo — below title, centered */}
+            {(() => {
+              const cover = event.coverImage ?? event.images[0];
+              return cover ? (
+                <div className="flex justify-center mb-8">
                   <div
-                    className="polaroid flex-shrink-0 w-44 md:w-60"
+                    className="polaroid w-56 md:w-72"
                     style={{ transform: "rotate(2deg)" }}
                   >
                     <div className="aspect-[3/4] relative overflow-hidden">
                       <Image src={cover} alt={event.title} fill className="object-cover" />
                     </div>
                   </div>
-                ) : null;
-              })()}
-            </div>
+                </div>
+              ) : null;
+            })()}
 
             <p className="text-charcoal/80 leading-relaxed mb-8 whitespace-pre-wrap">
               {event.description}
