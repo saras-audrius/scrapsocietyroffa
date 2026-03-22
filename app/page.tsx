@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";
@@ -14,6 +15,13 @@ import Link from "next/link";
 
 export default function Home() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [homePhotos, setHomePhotos] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/admin/content")
+      .then((r) => r.json())
+      .then((data: Record<string, string>) => setHomePhotos(data));
+  }, []);
 
   useEffect(() => {
     fetch("/api/events")
@@ -117,37 +125,43 @@ export default function Home() {
                 variants={fadeInUp}
               >
                 {[
-                  { icon: "✂️", label: "Cutting & pasting", bg: "from-tape-pink to-tape-yellow", rotate: -8, top: "0%", left: "10%" },
-                  { icon: "📖", label: "Zine making", bg: "from-sage/50 to-tape-mint", rotate: 6, top: "5%", left: "55%" },
-                  { icon: "💕", label: "Community", bg: "from-mustard/50 to-vintage-red/30", rotate: -4, top: "45%", left: "5%" },
-                  { icon: "⭐", label: "Creativity", bg: "from-tape-mint to-sage/50", rotate: 8, top: "50%", left: "50%" },
-                ].map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    className="polaroid absolute"
-                    style={{
-                      top: item.top,
-                      left: item.left,
-                      transform: `rotate(${item.rotate}deg)`,
-                    }}
-                    initial={{ opacity: 0, y: 30, rotate: item.rotate - 10 }}
-                    whileInView={{ opacity: 1, y: 0, rotate: item.rotate }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 + i * 0.15, type: "spring" }}
-                    whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
-                  >
-                    <div className={`w-28 h-28 bg-gradient-to-br ${item.bg} flex items-center justify-center`}>
-                      <span className="text-4xl">{item.icon}</span>
-                    </div>
-                    <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
-                      {item.label}
-                    </p>
-                    {/* Tape on some polaroids */}
-                    {i % 2 === 0 && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-tape-mint/80 rotate-2" />
-                    )}
-                  </motion.div>
-                ))}
+                  { icon: "✂️", label: "Cutting & pasting", bg: "from-tape-pink to-tape-yellow", rotate: -8, top: "0%", left: "10%", key: "home:polaroid:0" },
+                  { icon: "📖", label: "Zine making", bg: "from-sage/50 to-tape-mint", rotate: 6, top: "5%", left: "55%", key: "home:polaroid:1" },
+                  { icon: "💕", label: "Community", bg: "from-mustard/50 to-vintage-red/30", rotate: -4, top: "45%", left: "5%", key: "home:polaroid:2" },
+                  { icon: "⭐", label: "Creativity", bg: "from-tape-mint to-sage/50", rotate: 8, top: "50%", left: "50%", key: "home:polaroid:3" },
+                ].map((item, i) => {
+                  const photoUrl = homePhotos[item.key];
+                  return (
+                    <motion.div
+                      key={item.label}
+                      className="polaroid absolute"
+                      style={{
+                        top: item.top,
+                        left: item.left,
+                        transform: `rotate(${item.rotate}deg)`,
+                      }}
+                      initial={{ opacity: 0, y: 30, rotate: item.rotate - 10 }}
+                      whileInView={{ opacity: 1, y: 0, rotate: item.rotate }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3 + i * 0.15, type: "spring" }}
+                      whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
+                    >
+                      <div className={`w-28 h-28 relative overflow-hidden ${!photoUrl ? `bg-gradient-to-br ${item.bg} flex items-center justify-center` : ""}`}>
+                        {photoUrl ? (
+                          <Image src={photoUrl} alt={item.label} fill className="object-cover" />
+                        ) : (
+                          <span className="text-4xl">{item.icon}</span>
+                        )}
+                      </div>
+                      <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
+                        {item.label}
+                      </p>
+                      {i % 2 === 0 && (
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-tape-mint/80 rotate-2" />
+                      )}
+                    </motion.div>
+                  );
+                })}
 
                 {/* Scattered decorations */}
                 <motion.span

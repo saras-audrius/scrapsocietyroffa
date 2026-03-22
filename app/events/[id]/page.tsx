@@ -43,21 +43,38 @@ export default async function EventDetailPage({ params }: Props) {
               style={{ transform: "rotate(-1deg)" }}
             />
 
-            <h1 className="font-[family-name:var(--font-special-elite)] text-3xl text-charcoal mb-6">
-              {event.title}
-            </h1>
-
-            <div className="space-y-2 mb-6 text-sm text-charcoal/80">
-              <p className="flex items-center gap-2">
-                <span className="text-vintage-red">&#x2702;</span>
-                {event.date}{event.time ? ` • ${event.time}` : ""}
-              </p>
-              {event.location && (
-                <p className="flex items-center gap-2">
-                  <span className="text-vintage-red">&#x2691;</span>
-                  {event.location}
-                </p>
-              )}
+            {/* Title row — text left, cover photo right */}
+            <div className="flex gap-6 items-start mb-6">
+              <div className="flex-1 min-w-0">
+                <h1 className="font-[family-name:var(--font-special-elite)] text-3xl text-charcoal mb-4">
+                  {event.title}
+                </h1>
+                <div className="space-y-2 text-sm text-charcoal/80">
+                  <p className="flex items-center gap-2">
+                    <span className="text-vintage-red">&#x2702;</span>
+                    {event.date}{event.time ? ` • ${event.time}` : ""}
+                  </p>
+                  {event.location && (
+                    <p className="flex items-center gap-2">
+                      <span className="text-vintage-red">&#x2691;</span>
+                      {event.location}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {(() => {
+                const cover = event.coverImage ?? event.images[0];
+                return cover ? (
+                  <div
+                    className="polaroid flex-shrink-0 w-44 md:w-60"
+                    style={{ transform: "rotate(2deg)" }}
+                  >
+                    <div className="aspect-[3/4] relative overflow-hidden">
+                      <Image src={cover} alt={event.title} fill className="object-cover" />
+                    </div>
+                  </div>
+                ) : null;
+              })()}
             </div>
 
             <p className="text-charcoal/80 leading-relaxed mb-8 whitespace-pre-wrap">
@@ -87,58 +104,34 @@ export default async function EventDetailPage({ params }: Props) {
           </div>
 
           {/* Photo collage — after the card */}
-          {event.images.length > 0 && (() => {
+          {(() => {
             const cover = event.coverImage ?? event.images[0];
             const rest = event.images.filter((src) => src !== cover);
-            return (
+            return rest.length > 0 ? (
               <div className="mt-16">
                 <p className="font-[family-name:var(--font-caveat)] text-charcoal/50 text-base text-center mb-10">
                   — photos from this session —
                 </p>
-
-                {/* Cover photo — large and centred */}
-                <div className="flex justify-center mb-12">
-                  <div
-                    className="polaroid w-64 md:w-80"
-                    style={{ transform: "rotate(-1.5deg)" }}
-                  >
-                    <div className="aspect-[3/4] relative overflow-hidden">
-                      <Image
-                        src={cover}
-                        alt={event.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <p className="mt-3 text-center font-[family-name:var(--font-caveat)] text-sm text-charcoal/70">
-                      {event.title}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Remaining photos — grid */}
-                {rest.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-8 px-2">
-                    {rest.map((src, i) => (
-                      <div
-                        key={src}
-                        className="polaroid"
-                        style={{ transform: `rotate(${ROTATIONS[(i + 1) % ROTATIONS.length]}deg)` }}
-                      >
-                        <div className="aspect-square relative overflow-hidden">
-                          <Image
-                            src={src}
-                            alt={`${event.title} photo ${i + 2}`}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 px-2">
+                  {rest.map((src, i) => (
+                    <div
+                      key={src}
+                      className="polaroid"
+                      style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
+                    >
+                      <div className="aspect-square relative overflow-hidden">
+                        <Image
+                          src={src}
+                          alt={`${event.title} photo ${i + 1}`}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            );
+            ) : null;
           })()}
 
           {/* spacer so footer isn't flush */}

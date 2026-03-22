@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 
+const HOME_POLAROIDS = [
+  { key: "home:polaroid:0", label: "Cutting & pasting" },
+  { key: "home:polaroid:1", label: "Zine making" },
+  { key: "home:polaroid:2", label: "Community" },
+  { key: "home:polaroid:3", label: "Creativity" },
+];
+
 const SECTIONS = [
   {
     key: "home:hero:title",
@@ -67,6 +74,9 @@ export default function AdminContentPage() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoError, setLogoError] = useState("");
   const logoFileRef = useRef<HTMLInputElement>(null);
+  const [polaroidUploading, setPolaroidUploading] = useState<string | null>(null);
+  const [polaroidError, setPolaroidError] = useState<string | null>(null);
+  const polaroidFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
     fetch("/api/admin/content")
@@ -106,6 +116,41 @@ export default function AdminContentPage() {
       body: JSON.stringify({ key: "site:logo", value: "" }),
     });
     setContent((prev) => ({ ...prev, "site:logo": "" }));
+  }
+
+  async function handlePolaroidUpload(e: React.ChangeEvent<HTMLInputElement>, key: string) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPolaroidUploading(key);
+    setPolaroidError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+      const { url } = await res.json();
+      await fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value: url }),
+      });
+      setContent((prev) => ({ ...prev, [key]: url }));
+    } catch (err) {
+      setPolaroidError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setPolaroidUploading(null);
+      const ref = polaroidFileRefs.current[key];
+      if (ref) ref.value = "";
+    }
+  }
+
+  async function handlePolaroidRemove(key: string) {
+    await fetch("/api/admin/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key, value: "" }),
+    });
+    setContent((prev) => ({ ...prev, [key]: "" }));
   }
 
   async function handleSave(key: string) {
@@ -160,6 +205,55 @@ export default function AdminContentPage() {
           )}
         </div>
         {logoError && <p className="text-red-500 text-xs mt-2">{logoError}</p>}
+      </div>
+
+      {/* Home polaroid photos */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5">
+        <label className="block font-medium text-gray-700 text-sm mb-0.5">Home Page Polaroids</label>
+        <p className="text-xs text-gray-400 mb-4">
+          Upload a photo for each polaroid in the &quot;What is Scrap Society?&quot; section on the home page. Leave empty to show the default icon.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {HOME_POLAROIDS.map((slot) => {
+            const url = content[slot.key];
+            const isUploading = polaroidUploading === slot.key;
+            return (
+              <div key={slot.key} className="flex flex-col items-center gap-2">
+                <div className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
+                  {url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={url} alt={slot.label} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs text-gray-400 text-center px-1">{slot.label}</span>
+                  )}
+                </div>
+                <p className="text-xs font-medium text-gray-600 text-center">{slot.label}</p>
+                <div className="flex flex-col gap-1 w-full">
+                  <label className="cursor-pointer text-center text-xs bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded-lg transition">
+                    {isUploading ? "..." : url ? "Replace" : "+ Photo"}
+                    <input
+                      ref={(el) => { polaroidFileRefs.current[slot.key] = el; }}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handlePolaroidUpload(e, slot.key)}
+                      disabled={isUploading}
+                    />
+                  </label>
+                  {url && (
+                    <button
+                      onClick={() => handlePolaroidRemove(slot.key)}
+                      className="text-xs text-red-400 hover:text-red-600 transition"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {polaroidError && <p className="text-red-500 text-xs mt-3">{polaroidError}</p>}
       </div>
 
       <div className="space-y-4">
