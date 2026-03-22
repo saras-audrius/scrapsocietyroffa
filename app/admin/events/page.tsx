@@ -14,6 +14,7 @@ const emptyForm = (): Omit<Event, "id"> => ({
   registrationOpen: true,
   spotsLeft: undefined,
   images: [],
+  coverImage: undefined,
   tikkieUrl: "",
 });
 
@@ -107,7 +108,11 @@ export default function AdminEventsPage() {
   }
 
   function removeImage(url: string) {
-    setForm((prev) => ({ ...prev, images: prev.images.filter((u) => u !== url) }));
+    setForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((u) => u !== url),
+      coverImage: prev.coverImage === url ? undefined : prev.coverImage,
+    }));
   }
 
 
@@ -228,20 +233,33 @@ export default function AdminEventsPage() {
 
           {/* Image upload */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">Photos</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1">Photos</label>
+            <p className="text-xs text-gray-400 mb-2">Click the ★ on a photo to set it as the cover image shown on the events listing page.</p>
             <div className="flex flex-wrap gap-2 mb-2">
-              {form.images.map((url) => (
-                <div key={url} className="relative group">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" className="w-20 h-20 object-cover rounded-lg" />
-                  <button
-                    onClick={() => removeImage(url)}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs hidden group-hover:flex items-center justify-center"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+              {form.images.map((url) => {
+                const isCover = (form.coverImage ?? form.images[0]) === url;
+                return (
+                  <div key={url} className="relative group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" className={`w-20 h-20 object-cover rounded-lg border-2 transition ${isCover ? "border-amber-400" : "border-transparent"}`} />
+                    {/* Cover star */}
+                    <button
+                      onClick={() => setForm((prev) => ({ ...prev, coverImage: url }))}
+                      title="Set as cover photo"
+                      className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full text-xs flex items-center justify-center transition ${isCover ? "bg-amber-400 text-white" : "bg-black/40 text-white opacity-0 group-hover:opacity-100"}`}
+                    >
+                      ★
+                    </button>
+                    {/* Remove */}
+                    <button
+                      onClick={() => removeImage(url)}
+                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs hidden group-hover:flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
             </div>
             <label className="cursor-pointer inline-flex items-center gap-2 border border-dashed border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-500 hover:border-amber-400 hover:text-amber-600 transition">
               {uploading ? "Uploading..." : "+ Add photo"}

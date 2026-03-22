@@ -12,7 +12,7 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-const ROTATIONS = [-2, 3, -1, 2];
+const ROTATIONS = [-3, 4, -1.5, 3, -2.5, 2, -4, 1.5];
 
 export default async function EventDetailPage({ params }: Props) {
   const { id } = await params;
@@ -60,28 +60,32 @@ export default async function EventDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* Images */}
+            {/* Photo collage */}
             {event.images.length > 0 && (
-              <div className="flex flex-wrap gap-8 mb-8 justify-center">
-                {event.images.map((src, i) => (
-                  <div
-                    key={src}
-                    className="polaroid"
-                    style={{ transform: `rotate(${ROTATIONS[i % 4]}deg)` }}
-                  >
-                    <div className="w-72 h-72 relative overflow-hidden">
-                      <Image
-                        src={src}
-                        alt={`${event.title} photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                      />
+              <div className="mb-10 -mx-4 md:-mx-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 px-2 py-6">
+                  {event.images.map((src, i) => (
+                    <div
+                      key={src}
+                      className="polaroid"
+                      style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
+                    >
+                      <div className="aspect-square relative overflow-hidden">
+                        <Image
+                          src={src}
+                          alt={`${event.title} photo ${i + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      {i === 0 && (
+                        <p className="mt-2 text-center font-[family-name:var(--font-caveat)] text-sm text-charcoal/70">
+                          {event.title}
+                        </p>
+                      )}
                     </div>
-                    <p className="mt-2 text-center font-[family-name:var(--font-caveat)] text-sm text-charcoal/70">
-                      {event.title}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
 

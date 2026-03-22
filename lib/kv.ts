@@ -12,6 +12,7 @@ export interface Event {
   registrationOpen: boolean;
   spotsLeft?: number;
   images: string[]; // Vercel Blob URLs or local /images/ paths
+  coverImage?: string; // URL of the selected cover photo shown on the events listing page
   tikkieUrl?: string;
 }
 

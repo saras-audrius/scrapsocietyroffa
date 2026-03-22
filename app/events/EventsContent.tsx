@@ -13,6 +13,7 @@ export type { Event };
 
 const ROTATIONS = [-2, 3, -1, 2];
 
+
 export function EventsContent({
   upcomingEvents,
   pastEvents,
@@ -111,75 +112,46 @@ export function EventsContent({
               </motion.div>
 
               <motion.div
-                className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"
                 variants={staggerContainer}
               >
-                {pastEvents.flatMap((event, i) => {
-                  if (event.images.length > 0) {
-                    return event.images.map((src, j) => (
-                      <motion.div
-                        key={`${event.id}-${j}`}
-                        variants={fadeInUp}
-                        className="group"
-                      >
-                        <Link href={`/events/${event.id}`} className="block">
-                          <div
-                            className="polaroid transition-transform duration-200 group-hover:scale-105"
-                            style={{ transform: `rotate(${ROTATIONS[(i + j) % 4]}deg)` }}
-                          >
-                            <div className="aspect-square relative overflow-hidden">
-                              <Image
-                                src={src}
-                                alt={`${event.title} - photo ${j + 1}`}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform"
-                              />
-                            </div>
-                            <div className="mt-2 text-center">
-                              <p className="font-[family-name:var(--font-special-elite)] text-sm">
-                                {event.title}
-                              </p>
-                              <p className="text-xs text-charcoal/60">{event.date}</p>
-                            </div>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    ));
-                  }
+                {pastEvents.map((event, i) => {
+                  const cover = event.coverImage ?? event.images[0];
                   return (
                     <motion.div key={event.id} variants={fadeInUp} className="group">
                       <Link href={`/events/${event.id}`} className="block">
                         <div
-                          className="polaroid transition-transform duration-200 group-hover:scale-105"
-                          style={{ transform: `rotate(${ROTATIONS[i % 4]}deg)` }}
+                          className="polaroid transition-shadow duration-200 group-hover:shadow-xl"
+                          style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
                         >
-                          <div className="aspect-square bg-gradient-to-br from-kraft/50 to-tape-yellow/30 flex items-center justify-center">
-                            <span className="text-4xl group-hover:scale-110 transition-transform">
-                              &#x1F4F8;
-                            </span>
+                          <div className="aspect-square relative overflow-hidden">
+                            {cover ? (
+                              <Image
+                                src={cover}
+                                alt={event.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-kraft/50 to-tape-yellow/30 flex items-center justify-center">
+                                <span className="text-4xl">&#x1F4F8;</span>
+                              </div>
+                            )}
                           </div>
                           <div className="mt-2 text-center">
-                            <p className="font-[family-name:var(--font-special-elite)] text-sm">
+                            <p className="font-[family-name:var(--font-special-elite)] text-sm text-charcoal">
                               {event.title}
                             </p>
                             <p className="text-xs text-charcoal/60">{event.date}</p>
+                            <p className="text-xs text-vintage-red font-[family-name:var(--font-caveat)] mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                              View memories →
+                            </p>
                           </div>
                         </div>
                       </Link>
                     </motion.div>
                   );
                 })}
-
-                {/* Placeholder */}
-                <motion.div variants={fadeInUp}>
-                  <div className="polaroid opacity-60" style={{ transform: "rotate(-1deg)" }}>
-                    <div className="aspect-square bg-kraft/20 flex items-center justify-center border-2 border-dashed border-kraft">
-                      <span className="text-kraft text-sm font-[family-name:var(--font-special-elite)] text-center px-4">
-                        More memories coming...
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
               </motion.div>
             </motion.div>
           </div>
