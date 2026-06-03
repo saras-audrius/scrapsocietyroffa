@@ -17,6 +17,7 @@ function ContactForm() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get("event");
   const tikkieUrl = searchParams.get("tikkie");
+  const tikkieRequired = searchParams.get("tikkieRequired") === "1";
 
   const [formState, setFormState] = useState({
     name: "",
@@ -27,6 +28,7 @@ function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [tikkieConfirmed, setTikkieConfirmed] = useState(false);
 
   // Pre-fill form when coming from event registration
   useEffect(() => {
@@ -116,6 +118,7 @@ function ContactForm() {
             variant="secondary"
             onClick={() => {
               setIsSubmitted(false);
+              setTikkieConfirmed(false);
               setFormState({
                 name: "",
                 email: "",
@@ -224,12 +227,14 @@ function ContactForm() {
         </div>
 
         {tikkieUrl && (
-          <div className="p-4 bg-[#009FE3]/10 border border-[#009FE3]/30 rounded-xl">
+          <div className={`p-4 rounded-xl ${tikkieRequired ? "bg-[#009FE3]/15 border-2 border-[#009FE3]/50" : "bg-[#009FE3]/10 border border-[#009FE3]/30"}`}>
             <p className="font-[family-name:var(--font-special-elite)] text-charcoal text-sm mb-1">
-              Want to contribute?
+              {tikkieRequired ? "Payment required" : "Want to contribute?"}
             </p>
             <p className="text-xs text-charcoal/70 mb-3">
-              Our sessions are free but a small contribution helps keep the materials flowing!
+              {tikkieRequired
+                ? "Please pay via Tikkie before registering. You won't be able to submit without confirming payment."
+                : "Our sessions are free but a small contribution helps keep the materials flowing!"}
             </p>
             <a
               href={tikkieUrl}
@@ -239,6 +244,19 @@ function ContactForm() {
             >
               💙 Pay via Tikkie
             </a>
+            {tikkieRequired && (
+              <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={tikkieConfirmed}
+                  onChange={(e) => setTikkieConfirmed(e.target.checked)}
+                  className="w-4 h-4 accent-[#009FE3]"
+                />
+                <span className="text-sm text-charcoal font-medium">
+                  I have paid via Tikkie
+                </span>
+              </label>
+            )}
           </div>
         )}
 
@@ -247,9 +265,11 @@ function ContactForm() {
             type="submit"
             variant="primary"
             size="lg"
-            disabled={isSubmitting}
+            disabled={isSubmitting || (tikkieRequired && !tikkieConfirmed)}
           >
-            {isSubmitting ? "Sending..." : "Send Message ✉️"}
+            {tikkieRequired && !tikkieConfirmed
+              ? "Pay via Tikkie first 💙"
+              : isSubmitting ? "Sending..." : "Send Message ✉️"}
           </Button>
         </div>
 

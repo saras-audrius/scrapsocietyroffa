@@ -16,6 +16,7 @@ const emptyForm = (): Omit<Event, "id"> => ({
   images: [],
   coverImage: undefined,
   tikkieUrl: "",
+  tikkieRequired: false,
 });
 
 export default function AdminEventsPage() {
@@ -231,7 +232,7 @@ export default function AdminEventsPage() {
                 placeholder="https://tikkie.me/pay/..."
               />
             </div>
-            <div className="flex items-center gap-6 pt-5">
+            <div className="flex items-center gap-6 pt-5 flex-wrap">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -250,6 +251,17 @@ export default function AdminEventsPage() {
                 />
                 <span className="text-sm text-gray-700">Registration open</span>
               </label>
+              {form.tikkieUrl && (
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.tikkieRequired ?? false}
+                    onChange={(e) => setForm({ ...form, tikkieRequired: e.target.checked })}
+                    className="w-4 h-4 accent-[#009FE3]"
+                  />
+                  <span className="text-sm text-[#009FE3] font-medium">Tikkie required</span>
+                </label>
+              )}
             </div>
           </div>
 
@@ -369,7 +381,11 @@ export default function AdminEventsPage() {
                   )}
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">{event.date}{event.time ? ` · ${event.time}` : ""}{event.location ? ` · ${event.location}` : ""}</p>
-                {event.tikkieUrl && <span className="text-xs text-[#009FE3] mt-0.5 inline-block">💙 Tikkie set</span>}
+                {event.tikkieUrl && (
+                  <span className="text-xs text-[#009FE3] mt-0.5 inline-block">
+                    💙 Tikkie {event.tikkieRequired ? "(required)" : "(optional)"}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                 <button

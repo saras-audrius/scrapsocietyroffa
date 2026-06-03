@@ -86,7 +86,7 @@ export default async function EventDetailPage({ params }: Props) {
             <div className="flex flex-wrap items-center gap-4 mb-6">
               {event.registrationOpen ? (
                 <>
-                  <Link href={`/contact?event=${event.id}${event.tikkieUrl ? `&tikkie=${encodeURIComponent(event.tikkieUrl)}` : ""}`}>
+                  <Link href={`/contact?event=${event.id}${event.tikkieUrl ? `&tikkie=${encodeURIComponent(event.tikkieUrl)}` : ""}${event.tikkieRequired ? "&tikkieRequired=1" : ""}`}>
                     <Button variant="primary">Register now</Button>
                   </Link>
                   {event.spotsLeft && (

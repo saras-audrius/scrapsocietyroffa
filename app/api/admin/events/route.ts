@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     images: body.images ?? [],
     dateISO: body.dateISO || undefined,
     tikkieUrl: body.tikkieUrl || undefined,
+    tikkieRequired: body.tikkieRequired ?? false,
   };
 
   events.unshift(newEvent);
