@@ -277,7 +277,7 @@ function ContactForm() {
           <div className="mt-4 p-3 bg-vintage-red/10 border border-vintage-red/30 text-sm text-charcoal">
             {error}{" "}
             <a
-              href={`mailto:sarasaudrius@gmail.com?subject=${encodeURIComponent(
+              href={`mailto:anushkasrivastav942@gmail.com?subject=${encodeURIComponent(
                 formState.subject
               )}&body=${encodeURIComponent(
                 `Name: ${formState.name}\nEmail: ${formState.email}\n\n${formState.message}`
@@ -359,10 +359,10 @@ export default function ContactPage() {
                           Email
                         </p>
                         <a
-                          href="mailto:sarasaudrius@gmail.com"
+                          href="mailto:anushkasrivastav942@gmail.com"
                           className="text-vintage-red hover:underline text-sm"
                         >
-                          sarasaudrius@gmail.com
+                          anushkasrivastav942@gmail.com
                         </a>
                       </div>
                     </div>

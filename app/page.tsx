@@ -119,60 +119,62 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Polaroid grid - scattered style */}
+              {/* Polaroid grid - grid on mobile, scattered on desktop */}
               <motion.div
-                className="relative min-h-[400px]"
+                className="relative md:min-h-[400px]"
                 variants={fadeInUp}
               >
-                {[
-                  { icon: "✂️", defaultLabel: "Cutting & pasting", bg: "from-tape-pink to-tape-yellow", rotate: -8, top: "0%", left: "10%", key: "home:polaroid:0", labelKey: "home:polaroid:label:0" },
-                  { icon: "📖", defaultLabel: "Zine making", bg: "from-sage/50 to-tape-mint", rotate: 6, top: "5%", left: "55%", key: "home:polaroid:1", labelKey: "home:polaroid:label:1" },
-                  { icon: "💕", defaultLabel: "Community", bg: "from-mustard/50 to-vintage-red/30", rotate: -4, top: "45%", left: "5%", key: "home:polaroid:2", labelKey: "home:polaroid:label:2" },
-                  { icon: "⭐", defaultLabel: "Creativity", bg: "from-tape-mint to-sage/50", rotate: 8, top: "50%", left: "50%", key: "home:polaroid:3", labelKey: "home:polaroid:label:3" },
-                ].map((item, i) => {
-                  const photoUrl = homePhotos[item.key];
-                  const label = homePhotos[item.labelKey] || item.defaultLabel;
-                  return (
-                    <motion.div
-                      key={item.defaultLabel}
-                      className="polaroid absolute"
-                      style={{
-                        top: item.top,
-                        left: item.left,
-                        transform: `rotate(${item.rotate}deg)`,
-                      }}
-                      initial={{ opacity: 0, y: 30, rotate: item.rotate - 10 }}
-                      whileInView={{ opacity: 1, y: 0, rotate: item.rotate }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.3 + i * 0.15, type: "spring" }}
-                      whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
-                    >
-                      <div className={`w-28 h-28 relative overflow-hidden ${!photoUrl ? `bg-gradient-to-br ${item.bg} flex items-center justify-center` : ""}`}>
-                        {photoUrl ? (
-                          <Image src={photoUrl} alt={item.defaultLabel} fill className="object-cover" />
-                        ) : (
-                          <span className="text-4xl">{item.icon}</span>
+                <div className="grid grid-cols-2 gap-4 md:block">
+                  {[
+                    { icon: "✂️", defaultLabel: "Cutting & pasting", bg: "from-tape-pink to-tape-yellow", rotate: -8, top: "0%", left: "10%", key: "home:polaroid:0", labelKey: "home:polaroid:label:0" },
+                    { icon: "📖", defaultLabel: "Zine making", bg: "from-sage/50 to-tape-mint", rotate: 6, top: "5%", left: "55%", key: "home:polaroid:1", labelKey: "home:polaroid:label:1" },
+                    { icon: "💕", defaultLabel: "Community", bg: "from-mustard/50 to-vintage-red/30", rotate: -4, top: "45%", left: "5%", key: "home:polaroid:2", labelKey: "home:polaroid:label:2" },
+                    { icon: "⭐", defaultLabel: "Creativity", bg: "from-tape-mint to-sage/50", rotate: 8, top: "50%", left: "50%", key: "home:polaroid:3", labelKey: "home:polaroid:label:3" },
+                  ].map((item, i) => {
+                    const photoUrl = homePhotos[item.key];
+                    const label = homePhotos[item.labelKey] || item.defaultLabel;
+                    return (
+                      <motion.div
+                        key={item.defaultLabel}
+                        className="polaroid md:absolute"
+                        style={{
+                          top: item.top,
+                          left: item.left,
+                          transform: `rotate(${item.rotate}deg)`,
+                        }}
+                        initial={{ opacity: 0, y: 30, rotate: item.rotate - 10 }}
+                        whileInView={{ opacity: 1, y: 0, rotate: item.rotate }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 + i * 0.15, type: "spring" }}
+                        whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
+                      >
+                        <div className={`w-full aspect-square relative overflow-hidden ${!photoUrl ? `bg-gradient-to-br ${item.bg} flex items-center justify-center` : ""}`}>
+                          {photoUrl ? (
+                            <Image src={photoUrl} alt={item.defaultLabel} fill sizes="(max-width: 768px) 40vw, 112px" className="object-cover" />
+                          ) : (
+                            <span className="text-4xl">{item.icon}</span>
+                          )}
+                        </div>
+                        <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
+                          {label}
+                        </p>
+                        {i % 2 === 0 && (
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-tape-mint/80 rotate-2" />
                         )}
-                      </div>
-                      <p className="mt-2 text-center text-xs font-[family-name:var(--font-special-elite)]">
-                        {label}
-                      </p>
-                      {i % 2 === 0 && (
-                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-tape-mint/80 rotate-2" />
-                      )}
-                    </motion.div>
-                  );
-                })}
+                      </motion.div>
+                    );
+                  })}
+                </div>
 
-                {/* Scattered decorations */}
+                {/* Scattered decorations - desktop only */}
                 <motion.span
-                  className="absolute bottom-10 right-10 text-2xl"
+                  className="absolute bottom-10 right-10 text-2xl hidden md:block"
                   animate={{ rotate: [0, 15, 0] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 >
                   ✨
                 </motion.span>
-                <div className="absolute top-1/3 right-5 w-8 h-10 bg-tape-pink/40 rotate-12 torn-edge-all" />
+                <div className="absolute top-1/3 right-5 w-8 h-10 bg-tape-pink/40 rotate-12 torn-edge-all hidden md:block" />
               </motion.div>
             </motion.div>
           </div>
